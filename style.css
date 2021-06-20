@@ -2,3 +2,15 @@ body{
     background:#e0e0e0;
     font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
+
+.navbar-nav{
+    font-weight: 700;
+}
+
+#homecontent{
+    margin-right:0;
+}
+
+span.form-control.py-2{
+    cursor: pointer;
+}
