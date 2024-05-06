@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GA</title>
+  <!-- Google tag (gtag.js) -->
+  <!-- <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-HYXJWG3EB5"
+    ></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-QD8V6C9P4F"
+    ></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-7Q7W99LYJS"
+    ></script> -->
+
+  <!-- <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        console.log("trigger");
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+    gtag("config", "G-HYXJWG3EB5,G-QD8V6C9P4F,G-7Q7W99LYJS"); -->
+
+  <!-- gtag('create', 'G-HYXJWG3EB5', 'auto', {'name': 'G-QD8V6C9P4F'});
+        gtag("config", "G-QD8V6C9P4F");
+        gtag("config", "G-HYXJWG3EB5");
+        gtag("config", "G-7Q7W99LYJS");
+    </script>   -->
+
+  <style>
+    ul {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    li {
+      text-decoration: none;
+      list-style: none;
+    }
+  </style>
+</head>
+
+<body style="text-align: center">
+  <iframe style="width: 50%; height: 500px"
+    src="https://media.flickfusion.net/p/v.php?video_fkey=043F5255-B338-1755-6FD6-97AB7AD58497&vehicle_fkey=&referer=&yt_url=&auto_resize=1"
+    frameborder="0"></iframe>
+  <input type="hidden" id="video_fk" name="video_fk" value="043F5255-B338-1755-6FD6-97AB7AD58497">
+  <input type="hidden" id="vin" name="vin" value="2C3LA63HX7H604177">
+  <input type="hidden" id="stock" name="stock" value="">
+  <input type="hidden" id="year" name="year" value="">
+  <input type="hidden" id="make" name="make" value="">
+  <input type="hidden" id="model" name="model" value="">
+  <input type="hidden" id="trim" name="trim" value="">
+  <input type="hidden" id="body_type" name="body_type" value="">
+  <div id="base_url_div" data-baseurl="http://nfmedia.flickfusion.net" style="display:none"></div>
+
+  <script>
+    let video_fk = document.getElementById('video_fk')?.getAttribute('value');
+    let base_url = document.getElementById('base_url_div')?.getAttribute('data-baseUrl');
+
+    if (video_fk && base_url) {
+      getGoogleAnalyticsIds(video_fk);
+    }
+
+    let vehicleVin = document.getElementById('vin')?.getAttribute('value');
+    let vehicleStock = document.getElementById('stock')?.getAttribute('value');
+    let vehicleYear = document.getElementById('year')?.getAttribute('value');
+    let vehicleMake = document.getElementById('make')?.getAttribute('value');
+    let vehicleModel = document.getElementById('model')?.getAttribute('value');
+    let vehicleTrim = document.getElementById('trim')?.getAttribute('value');
+    let vehicleBodyType = document.getElementById('body_type')?.getAttribute('value');
+
+    let vehicle_data = {
+      vin: vehicleVin,
+      stock: vehicleStock,
+      year: vehicleYear,
+      make: vehicleMake,
+      model: vehicleModel,
+      trim: vehicleTrim,
+      body_type: vehicleBodyType
+    }
+
+    async function getGoogleAnalyticsIds(video_fk) {
+      const response = await fetch(`${base_url}/h53/dd/video_json.php?&video_fkey=${video_fk}`);
+      if (response.ok) {
+        const data = await response.json();
+        let trackingIds = data.addons[4].data.tracking_id;
+        let GA_trackId = trackingIds ? trackingIds.split(',') : [];
+
+        if (GA_trackId.length != 0) {
+
+          parent.postMessage(JSON.stringify({ ga_track_id: GA_trackId, 'action': 'ga_track_id' }), "*");
+
+          let script = document.createElement('script');
+
+          script.src = 'https://storage.googleapis.com/player_h5/_common/js/concat/utils/Messages.min.js';
+
+          document.head.appendChild(script);
+
+          setTimeout(() => {
+            window.concat?.utils.Messages.receive("csi-mp", function (data) {
+              parent.postMessage(JSON.stringify({ video_data: data, vehicle_data: vehicle_data, 'action': 'video_data' }), "*");
+            }).start();
+          }, 500)
+
+        }
+      }
+    }
+
+    document.getElementById("defaultForm")?.addEventListener("submit", function (event) {
+      event.preventDefault();
+      submitFormEvent();
+    });
+
+    function submitFormEvent() {
+      let firstName = document.querySelector('#firstName')?.value;
+      let lastName = document.querySelector('#lastName')?.value;
+      let email = emailValidation();
+      let phone = phoneValidation();
+
+      if (firstName != "" && lastName != "" && email && phone) {
+        parent.postMessage(JSON.stringify({ form_submit_data: vehicle_data, 'action': 'form_submit_data' }), "*");
+      }
+    }
+
+    function emailValidation() {
+      let emailVal = document.querySelector('#email')?.value;
+      let emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+      if (emailVal != "" && !emailRegex.test(emailVal))
+        return;
+      else
+        return emailVal;
+    }
+
+    function phoneValidation() {
+      let phoneVal = document.querySelector('#phone')?.value;
+      var phoneRegex = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+      if (phoneVal != "" && !phoneRegex.test(phoneVal))
+        return;
+      else
+        return phoneVal;
+    }
+  </script>
+</body>
+
+</html>
